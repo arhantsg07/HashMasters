@@ -51,6 +51,10 @@ class ReportCreate(BaseModel):
     longitude: float
     evidence_files: Optional[list[str]] = Field(default=[])
 
+class UserLocationResponse(BaseModel):
+    latitude: float
+    longitude: float
+
 # ----------------------- Helpers -----------------------
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
@@ -141,7 +145,7 @@ async def create_report(report: ReportCreate):
 @app.get("/heatmap/coordinates", response_model=list[Coordinate])
 async def get_heatmap_coordinates():
     try:
-        response = supabase.table('crime_report').select('latitude, longitude').execute()
+        response = supabase.table('reports').select('latitude, longitude').execute()
         data = response.data
         return [
             {"latitude": row["latitude"], "longitude": row["longitude"]}
@@ -149,3 +153,38 @@ async def get_heatmap_coordinates():
         ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
+    
+
+@app.get("/user/location", response_model=UserLocationResponse)
+def get_user_location(user_id: str):  # Or get from session/token if you have auth
+    """
+    Returns the logged-in user's saved location.
+    """
+    try:
+        # Fetch from Supabase
+        response = (
+            supabase.table("reports")
+            .select("latitude, longitude")
+            .eq("id", user_id)
+            .single()
+            .execute()
+        )
+
+        if not response.data:
+            raise HTTPException(status_code=404, detail="User location not found")
+
+        return {
+            "latitude": response.data["latitude"],
+            "longitude": response.data["longitude"],
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/issues")
+def get_issues():
+    try:
+        response = supabase.table("category").select("*").execute()
+        return response.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
