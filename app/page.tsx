@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { MapPin, AlertTriangle, Droplets, Trash2, Construction, Eye, Clock, Users, Filter, Search } from 'lucide-react';
 
 interface Issue {
@@ -124,7 +125,7 @@ export default function CivicIssueTracker() {
     }
 
     if (searchTerm) {
-      filtered = filtered.filter(issue => 
+      filtered = filtered.filter(issue =>
         issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         issue.location.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -136,7 +137,7 @@ export default function CivicIssueTracker() {
   const formatTimeAgo = (date: Date) => {
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) return 'Just now';
     if (diffInHours < 24) return `${diffInHours}h ago`;
     return `${Math.floor(diffInHours / 24)}d ago`;
@@ -165,7 +166,7 @@ export default function CivicIssueTracker() {
 
           <h3 className="font-bold text-lg text-gray-800 mb-2">{issue.title}</h3>
           <p className="text-gray-600 mb-3 line-clamp-2">{issue.description}</p>
-          
+
           <div className="flex items-center text-gray-500 text-sm mb-4">
             <MapPin size={16} className="mr-1" />
             <span>{issue.location}</span>
@@ -212,11 +213,24 @@ export default function CivicIssueTracker() {
                 <p className="text-xs text-gray-500">Kota Community Issues</p>
               </div>
             </div>
-            
-            <div className="flex items-center gap-4">
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                Report Issue
-              </button>
+
+            <div className='flex gap-4'>
+              <div className="flex items-center gap-4">
+                <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                  <Link href="/login">Login </Link>
+                </button>
+              </div>
+              <div className="flex items-center gap-4">
+                <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                  <Link href="/login">Admin Login</Link>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                  <Link href="/report-issue">Report Issue</Link>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -231,7 +245,7 @@ export default function CivicIssueTracker() {
           <p className="text-xl md:text-2xl mb-8 text-blue-100">
             View reported road damages, garbage issues, and water leaks within {radiusKm} km radius
           </p>
-          
+
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
             <div className="bg-white/10 backdrop-blur-md rounded-lg p-4">
@@ -270,7 +284,7 @@ export default function CivicIssueTracker() {
                 />
               </div>
             </div>
-            
+
             <div className="flex gap-4">
               <select
                 className="px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -282,7 +296,7 @@ export default function CivicIssueTracker() {
                 <option value="garbage">Garbage</option>
                 <option value="water_leak">Water Leak</option>
               </select>
-              
+
               <select
                 className="px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={selectedPriority}
