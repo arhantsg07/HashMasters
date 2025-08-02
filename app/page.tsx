@@ -702,6 +702,41 @@ export default function CivicIssueTracker() {
             </div>
 
             <div className='flex gap-4'>
+
+       
+              {isLoggedIn ? (
+                <div className="flex items-center gap-4">
+                  <span className="text-gray-700 font-semibold">Welcome, {username}</span>
+                  <button
+                    onClick={handleLogout}
+                    className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-2 rounded-full font-medium hover:from-red-600 hover:to-orange-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                  >
+                    Logout
+                  </button>
+                  <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                      <Link href="/my-issues">My Issues </Link>
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-4">
+                    <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                      <Link href="/login">Login </Link>
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                      <Link href="/AdminLogin">Admin Login</Link>
+                    </button>
+                  </div>
+                </>
+              )}
+              <div className="flex items-center gap-4">
+                <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                  <Link href="/report-issue">Report Issue</Link>
+                </button>
+              </div>
+
               <Link href="/login" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
                 Login
               </Link>
@@ -711,6 +746,7 @@ export default function CivicIssueTracker() {
               <Link href="/report-issue" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
                 Report Issue
               </Link>
+
             </div>
           </div>
         </div>
