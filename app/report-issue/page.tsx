@@ -197,7 +197,7 @@ export default function ReportCrimePage() {
 
           const { data, error } = await supabase.storage
             .from("evidence")
-            .upload(${Date.now()}_${file.name}, file);
+            .upload(`${Date.now()}_${file.name}`, file);
 
           if (error) {
             console.error("Error uploading file:", error);
@@ -251,7 +251,7 @@ export default function ReportCrimePage() {
       if (response.ok) {
         alert("Crime report submitted successfully!");
       } else {
-        alert(Error: ${data.detail || "Failed to submit report"});
+        alert(`Error: ${data.detail || "Failed to submit report"}`);
       }
     } catch (error) {
       console.error("Error submitting report:", error);
