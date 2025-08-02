@@ -262,7 +262,7 @@ export default function CivicIssueTracker() {
                   </div>
                   <div className="flex items-center gap-4">
                     <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                      <Link href="/login">Admin Login</Link>
+                      <Link href="/AdminLogin">Admin Login</Link>
                     </button>
                   </div>
                 </>
