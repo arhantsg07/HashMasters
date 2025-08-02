@@ -429,7 +429,10 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { MapPin, AlertTriangle, Droplets, Trash2, Construction, Eye, Clock, Users, Search, Zap, Shield, Blocks } from 'lucide-react';
+import {
+  MapPin, AlertTriangle, Droplets, Trash2, Construction, Eye,
+  Clock, Users, Search, Zap, Shield, Blocks
+} from 'lucide-react';
 import { supabase } from './auth';
 
 interface Issue {
@@ -451,9 +454,9 @@ const issueTypeConfig = {
   road_damage: { icon: Construction, color: 'text-orange-600', bg: 'bg-orange-100', label: 'Road Damage' },
   lightning: { icon: Zap, color: 'text-yellow-600', bg: 'bg-yellow-100', label: 'Lightning/Electrical' },
   water_supply: { icon: Droplets, color: 'text-blue-600', bg: 'bg-blue-100', label: 'Water Supply' },
-  cleanliness: { icon: Trash2, color: 'text-green-600', bg: 'bg-green-100', label: 'Cleanliness'},
-  public_safety: { icon: Shield, color: 'text-red-600', bg: 'bg-red-100', label: 'Public Safety'},
-  obstructions: { icon: Blocks, color: 'text-purple-600', bg: 'bg-purple-100', label: 'Obstructions'}
+  cleanliness: { icon: Trash2, color: 'text-green-600', bg: 'bg-green-100', label: 'Cleanliness' },
+  public_safety: { icon: Shield, color: 'text-red-600', bg: 'bg-red-100', label: 'Public Safety' },
+  obstructions: { icon: Blocks, color: 'text-purple-600', bg: 'bg-purple-100', label: 'Obstructions' }
 };
 
 const statusConfig = {
@@ -472,10 +475,36 @@ export default function CivicIssueTracker() {
   const [radiusKm, setRadiusKm] = useState<number>(5);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState('');
 
-  // Haversine formula to calculate distance between two points
-  function getDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371; // Earth's radius in kilometers
+  // Load user from localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const userObj = JSON.parse(storedUser);
+        if (userObj?.isLoggedIn && userObj.username) {
+          setIsLoggedIn(true);
+          setUsername(userObj.username);
+        }
+      } catch (e) {
+        console.warn("Failed to parse stored user.");
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("username");
+    localStorage.removeItem("user");
+    document.cookie = "auth-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    setIsLoggedIn(false);
+    setUsername('');
+  };
+
+  const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371;
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
     const dLon = ((lon2 - lon1) * Math.PI) / 180;
     const a =
@@ -485,9 +514,8 @@ export default function CivicIssueTracker() {
       Math.sin(dLon / 2) ** 2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
-  }
+  };
 
-  // Fetch user location using browser's geolocation API
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -495,17 +523,16 @@ export default function CivicIssueTracker() {
           setUserLocation([position.coords.latitude, position.coords.longitude]);
         },
         (err) => {
-          console.error("Error fetching user location:", err);
-          // Fallback to Kota, Rajasthan coordinates
-          setUserLocation([25.2138, 75.8648]);
+          console.warn("Using fallback location. Reason:", err.message);
+          setUserLocation([25.2138, 75.8648]); // Kota fallback
         }
       );
     } else {
-      console.error("Geolocation is not supported by this browser.");
-      // Fallback to Kota, Rajasthan coordinates
+      console.warn("Geolocation not supported. Using fallback.");
       setUserLocation([25.2138, 75.8648]);
     }
   }, []);
+
 
   // Fetch issues from Supabase within radius
   useEffect(() => {
@@ -701,11 +728,9 @@ export default function CivicIssueTracker() {
               </div>
             </div>
 
-            <div className='flex gap-4'>
-
-       
+            <div className="flex gap-4">
               {isLoggedIn ? (
-                <div className="flex items-center gap-4">
+                <>
                   <span className="text-gray-700 font-semibold">Welcome, {username}</span>
                   <button
                     onClick={handleLogout}
@@ -713,45 +738,27 @@ export default function CivicIssueTracker() {
                   >
                     Logout
                   </button>
-                  <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                      <Link href="/my-issues">My Issues </Link>
-                  </button>
-                </div>
+                  <Link href="/my-issues" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                    My Issues
+                  </Link>
+                </>
               ) : (
                 <>
-                  <div className="flex items-center gap-4">
-                    <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                      <Link href="/login">Login </Link>
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                      <Link href="/AdminLogin">Admin Login</Link>
-                    </button>
-                  </div>
+                  <Link href="/login" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                    Login
+                  </Link>
+                  <Link href="/admin-login" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                    Admin Login
+                  </Link>
                 </>
               )}
-              <div className="flex items-center gap-4">
-                <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                  <Link href="/report-issue">Report Issue</Link>
-                </button>
-              </div>
-
-              <Link href="/login" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                Login
-              </Link>
-              <Link href="/admin-login" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                Admin Login
-              </Link>
               <Link href="/report-issue" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
                 Report Issue
               </Link>
-
             </div>
           </div>
         </div>
       </header>
-
       {error && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">
